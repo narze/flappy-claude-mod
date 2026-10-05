@@ -21,7 +21,8 @@ A Flappy Bird-like game inside Claude Code, as a mod (a plugin of function hooks
 ## Install
 
 ```sh
-claude --plugin-dir /path/to/flappy-claude
+git clone https://github.com/narze/flappy-claude-mod
+claude --plugin-dir "$PWD/flappy-claude-mod"
 ```
 
 ## Develop

@@ -1,1 +1,1 @@
-{ "name": "flappy-claude", "version": "0.1.0", "description": "A Flappy Bird-like game in a Claude Code pane", "author": { "name": "narze" }, "license": "MIT", "types": "./types/index.d.ts" }
+{ "name": "flappy-claude", "version": "0.1.0", "description": "A Flappy Bird-like game in a Claude Code pane", "author": { "name": "narze" }, "license": "MIT", "repository": "https://github.com/narze/flappy-claude-mod", "types": "./types/index.d.ts" }
