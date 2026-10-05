@@ -51,14 +51,14 @@ test('the gap always fits the mascot with room to spare', () => {
   }
 })
 
-test('the mascot sprite is the Claude critter at half size, 7x4', () => {
+test('the mascot sprite is the 9x4 Claude critter', () => {
   expect(MASCOT.length).toBe(BIRD_HEIGHT)
   for (const line of MASCOT) expect(line.length).toBe(BIRD_WIDTH)
   expect(MASCOT).toEqual([
-    '.#####.',
-    '##e#e##',
-    '.#####.',
-    '.##.##.',
+    '.#######.',
+    '##e###e##',
+    '.#######.',
+    '.#.#.#.#.',
   ])
 })
 
@@ -113,7 +113,9 @@ test('paint draws sky, ground, bird and pipes into half-block rows', () => {
   expect(pixels[(by + 1) * W + bx]).toBe(COLORS.bird) // ear
   expect(pixels[(by + 1) * W + bx + 1]).toBe(COLORS.bird)
   expect(pixels[(by + 1) * W + bx + 2]).toBe(COLORS.eye)
-  expect(pixels[(by + 3) * W + bx + 3]).toBe(COLORS.sky) // between the legs
+  expect(pixels[(by + 3) * W + bx + 1]).toBe(COLORS.bird) // a leg
+  expect(pixels[(by + 3) * W + bx + 2]).toBe(COLORS.sky) // between the legs
+  expect(pixels[(by + 1) * W + bx + 6]).toBe(COLORS.eye)
   expect(pixels[2 * W + 41]).toBe(COLORS.pipe)
   expect(pixels[12 * W + 41]).toBe(COLORS.sky)
 

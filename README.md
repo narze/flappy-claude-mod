@@ -3,7 +3,7 @@
 A Flappy Bird-like game inside Claude Code, as a mod (a plugin of function hooks).
 
 - Plays in the band above the prompt, drawn with half blocks (`▀`): one cell is 1x2 pixels, in color
-- You fly the Claude mascot: a 7x4 orange critter with ears, eyes and legs
+- You fly the Claude mascot: a 9x4 orange critter with ears, eyes and four legs
 - A flap sound on each flap (macOS, through `afplay`)
 - Runs in a `Client` surface module: its own 30 fps frame clock, keys and clicks, no round trip through the hooks
 - Best score kept across sessions in `$.store`
