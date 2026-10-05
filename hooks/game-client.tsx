@@ -12,7 +12,7 @@ type State = { game: Game; flap: boolean }
 const TICK_MS = 33
 const MIN_COLUMNS = 20
 // The score line plus enough sky for the mascot to fly through a gap.
-const MIN_ROWS = 10
+const MIN_ROWS = 11
 const FLAP_KEYS = new Set([' ', 'space', 'up', 'w', 'k', 'return'])
 
 // Instances whose clock and input are wired; the surface object is the
