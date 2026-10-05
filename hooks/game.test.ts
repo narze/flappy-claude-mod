@@ -61,7 +61,10 @@ test('pipes come slowly and far apart', () => {
   let g = step(newGame(120, 46, 3), true)
   for (let i = 0; i < 120; i++) g = step({ ...g, birdY: 20, velocity: 0 }, false)
   const xs = g.pipes.map(pipe => pipe.x)
-  for (let i = 1; i < xs.length; i++) expect(xs[i]! - xs[i - 1]!).toBeGreaterThanOrEqual(32)
+  for (let i = 1; i < xs.length; i++) {
+    expect(xs[i]! - xs[i - 1]!).toBeGreaterThanOrEqual(30)
+    expect(xs[i]! - xs[i - 1]!).toBeLessThan(31)
+  }
   // 120 ticks (4 s) move a pipe no more than 55 columns
   expect(120 - (xs[0] ?? 0)).toBeLessThanOrEqual(55)
 })

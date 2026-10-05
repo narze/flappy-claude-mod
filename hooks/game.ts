@@ -24,7 +24,7 @@ const GRAVITY = 0.11
 const FLAP = -1.3
 const MAX_FALL = 1.8
 const SPEED = 0.45
-const SPACING = 34
+const SPACING = 30
 const MARGIN = 3
 // Ticks after a crash before a flap may restart, so a late flap does not.
 const RESTART_DELAY = 15
