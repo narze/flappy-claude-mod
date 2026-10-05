@@ -69,6 +69,10 @@ test('pipes come slowly and far apart', () => {
   expect(120 - (xs[0] ?? 0)).toBeLessThanOrEqual(55)
 })
 
+test('pipes are 6 pixels wide', () => {
+  expect(PIPE_WIDTH).toBe(6)
+})
+
 test('the mascot sprite is the 9x5 Claude critter', () => {
   expect(MASCOT.length).toBe(BIRD_HEIGHT)
   for (const line of MASCOT) expect(line.length).toBe(BIRD_WIDTH)
@@ -146,7 +150,7 @@ test('paint draws sky, ground, bird and pipes into half-block rows', () => {
   }
   // runs merge equal neighbours: sky, the pipe's edge, pipe, edge, sky
   expect(lines[0]?.map(run => [run.text.length, run.fg])).toEqual([
-    [40, COLORS.sky], [1, COLORS.pipeEdge], [2, COLORS.pipe], [1, COLORS.pipeEdge], [16, COLORS.sky],
+    [40, COLORS.sky], [1, COLORS.pipeEdge], [4, COLORS.pipe], [1, COLORS.pipeEdge], [14, COLORS.sky],
   ])
   const clear = rows(paint({ ...g, pipes: [] }), W, H)
   expect(clear[0]).toEqual([{ text: '▀'.repeat(W), fg: COLORS.sky, bg: COLORS.sky }])

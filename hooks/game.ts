@@ -42,7 +42,7 @@ export const BIRD_HEIGHT = 5
 // Crashes count the body columns only: brushing a pipe with an ear is fair.
 const HIT_LEFT = 1
 const HIT_RIGHT = BIRD_WIDTH - 1
-export const PIPE_WIDTH = 4
+export const PIPE_WIDTH = 6
 export const GROUND = 2
 
 export const COLORS = {
