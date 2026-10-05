@@ -37,6 +37,14 @@ export const MASCOT = [
   '.#######.',
   '.#.#.#.#.',
 ] as const
+// While rising after a flap: the hands drop one pixel, like a wing beat.
+export const MASCOT_FLAP = [
+  '.#######.',
+  '.#e###e#.',
+  '#########',
+  '.#######.',
+  '.#.#.#.#.',
+] as const
 export const BIRD_WIDTH = 9
 export const BIRD_HEIGHT = 5
 // Crashes count the body columns only: brushing a pipe with an ear is fair.
@@ -227,7 +235,8 @@ export function paint(game: Game, best = 0): string[] {
   if (game.phase !== 'ready') write(String(game.score), SCORE_TOP, COLORS.title, COLORS.titleShadow, SCORE_LEFT)
   const bx = birdX(width)
   const by = Math.round(game.birdY)
-  MASCOT.forEach((line, dy) => {
+  const sprite = game.phase === 'playing' && game.velocity < 0 ? MASCOT_FLAP : MASCOT
+  sprite.forEach((line, dy) => {
     for (let dx = 0; dx < line.length; dx++) {
       const pixel = line[dx]
       if (pixel === '#') set(bx + dx, by + dy, COLORS.bird)

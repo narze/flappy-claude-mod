@@ -1,6 +1,6 @@
 import { expect, test } from 'claude-code/testing'
 
-import { BIRD_HEIGHT, BIRD_WIDTH, COLORS, DEAD_EYE, GROUND, MASCOT, PIPE_WIDTH, SCORE_LEFT, SCORE_TOP, TITLE_TOP, birdX, newGame, paint, rows, step, type Game } from './game.ts'
+import { BIRD_HEIGHT, BIRD_WIDTH, COLORS, DEAD_EYE, GROUND, MASCOT, MASCOT_FLAP, PIPE_WIDTH, SCORE_LEFT, SCORE_TOP, TITLE_TOP, birdX, newGame, paint, rows, step, type Game } from './game.ts'
 
 const W = 60
 const H = 40
@@ -125,7 +125,8 @@ test('after game over a flap starts a fresh game, not at once', () => {
 })
 
 test('paint draws sky, ground, bird and pipes into half-block rows', () => {
-  const g: Game = { ...step(newGame(W, H, 1), true), pipes: [{ x: 40, gapTop: 10, isScored: false }] }
+  // falling (velocity > 0), so the resting sprite
+  const g: Game = { ...step(newGame(W, H, 1), true), velocity: 1, pipes: [{ x: 40, gapTop: 10, isScored: false }] }
   const pixels = paint(g)
   expect(pixels.length).toBe(W * H)
   expect(pixels[0]).toBe(COLORS.sky)
@@ -241,4 +242,33 @@ test('the score is drawn over a pipe', () => {
 test('the title screen shows no score', () => {
   const ready = paint(newGame(W, H, 1))
   expect(ready[SCORE_TOP * W + SCORE_LEFT]).toBe(COLORS.sky)
+})
+
+test('while rising the hands drop a pixel; while falling they are back', () => {
+  expect(MASCOT_FLAP).toEqual([
+    '.#######.',
+    '.#e###e#.',
+    '#########',
+    '.#######.',
+    '.#.#.#.#.',
+  ])
+  const base: Game = { ...step(newGame(W, H, 1), true), birdY: 20 }
+  const bx = birdX(W)
+  const hand = (g: Game, dy: number) => [paint(g)[(20 + dy) * W + bx], paint(g)[(20 + dy) * W + bx + 8]]
+  const rising = { ...base, velocity: -1 }
+  expect(hand(rising, 1)).toEqual([COLORS.sky, COLORS.sky])
+  expect(hand(rising, 2)).toEqual([COLORS.bird, COLORS.bird])
+  const falling = { ...base, velocity: 1 }
+  expect(hand(falling, 1)).toEqual([COLORS.bird, COLORS.bird])
+  expect(hand(falling, 2)).toEqual([COLORS.sky, COLORS.sky])
+})
+
+test('on the title screen and after a crash the hands stay up', () => {
+  const bx = birdX(W)
+  const ready = newGame(W, H, 1)
+  const by = Math.round(ready.birdY)
+  expect(paint(ready)[(by + 1) * W + bx]).toBe(COLORS.bird)
+  const over = untilOver(step(newGame(W, H, 1), true))
+  const oy = Math.round(over.birdY)
+  expect(paint({ ...over, velocity: -1 })[(oy + 1) * W + bx]).toBe(COLORS.bird)
 })
