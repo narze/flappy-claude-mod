@@ -63,6 +63,17 @@ test('/flappy-claude shows the game above the prompt; again hides it', async ($,
   await ui.unmount()
 })
 
+test('the game is 24 rows tall when there is room, else what fits', async ($, on) => {
+  fakeEngine(on)
+  await open($)
+  const roomy = await $.ui.mount({ ...BAND, props: { ...(BAND.props as object), maxRows: 40 } as never })
+  expect((await roomy.find({ key: 'game' }))?.props.height).toBe(24)
+  await roomy.unmount()
+  const tight = await $.ui.mount(BAND)
+  expect((await tight.find({ key: 'game' }))?.props.height).toBe(19)
+  await tight.unmount()
+})
+
 test('the band stays the engine one until the game is opened', async ($, on) => {
   fakeEngine(on)
   await $.session.start({ cwd: '/', surface: 'terminal', isInteractive: true })

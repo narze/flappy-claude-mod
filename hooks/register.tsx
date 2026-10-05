@@ -3,7 +3,7 @@ import type { Register } from 'claude-code'
 
 const FLAP_SOUND = 'sounds/flap.wav'
 // Rows the game takes above the prompt, its score line included.
-const BAND_ROWS = 16
+const BAND_ROWS = 24
 
 // The best score, kept across sessions in $.store; the band redraws on change.
 const best = atom({ plugin: 'flappy-claude', key: 'best' } as const, 0)

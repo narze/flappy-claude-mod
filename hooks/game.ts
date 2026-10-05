@@ -18,12 +18,13 @@ export type Game = {
 }
 export type Run = { text: string; fg: string; bg: string }
 
-// Tuned for 30 ticks a second.
-const GRAVITY = 0.14
-const FLAP = -1.4
-const MAX_FALL = 2.2
-const SPEED = 0.6
-const SPACING = 26
+// Tuned for 30 ticks a second, on the easy side: a gentle fall, slow
+// pipes far apart, and a gap about half the play height.
+const GRAVITY = 0.11
+const FLAP = -1.3
+const MAX_FALL = 1.8
+const SPEED = 0.45
+const SPACING = 34
 const MARGIN = 3
 // Ticks after a crash before a flap may restart, so a late flap does not.
 const RESTART_DELAY = 15
@@ -60,7 +61,7 @@ export function newGame(width: number, height: number, seed: number): Game {
   return {
     width,
     height,
-    gap: Math.min(height - GROUND - 6, Math.max(BIRD_HEIGHT + 6, Math.round(height * 0.4))),
+    gap: Math.min(height - GROUND - 6, Math.max(BIRD_HEIGHT + 8, Math.round(height * 0.5))),
     seed: Math.abs(Math.floor(seed)) % 0x7fffffff || 1,
     phase: 'ready',
     birdY: height / 2,
