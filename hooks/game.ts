@@ -20,7 +20,7 @@ export type Run = { text: string; fg: string; bg: string }
 
 // Tuned for 30 ticks a second.
 const GRAVITY = 0.14
-const FLAP = -1.7
+const FLAP = -1.4
 const MAX_FALL = 2.2
 const SPEED = 0.6
 const SPACING = 26
@@ -50,7 +50,7 @@ export function newGame(width: number, height: number, seed: number): Game {
   return {
     width,
     height,
-    gap: Math.max(10, Math.round(height * 0.3)),
+    gap: Math.max(10, Math.round(height * 0.34)),
     seed: Math.abs(Math.floor(seed)) % 0x7fffffff || 1,
     phase: 'ready',
     birdY: height / 2,
