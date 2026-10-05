@@ -1,6 +1,7 @@
 // The game's surface module: runs on the drawing side with its own frame
 // clock, keys and clicks, so play needs no round trip through the hooks.
-// It posts `{ score }` to the hooks module when a run ends.
+// It posts to the hooks module: `{ flap }` (the hooks play the sound),
+// `{ score }` when a run ends, `{ close }` on q.
 import type { ClientModule, ClientSurface } from 'claude-code'
 
 import { newGame, rows, paint, step, type Game } from './game.ts'
@@ -10,7 +11,8 @@ type State = { game: Game; flap: boolean }
 
 const TICK_MS = 33
 const MIN_COLUMNS = 20
-const MIN_ROWS = 6
+// The score line plus enough sky for the mascot to fly through a gap.
+const MIN_ROWS = 14
 const FLAP_KEYS = new Set([' ', 'space', 'up', 'w', 'k', 'return'])
 
 // Instances whose clock and input are wired; the surface object is the
@@ -21,10 +23,13 @@ function wire(surface: ClientSurface<State>) {
   started.add(surface)
   const flap = () => {
     const state = surface.state
-    if (state) surface.setState({ ...state, flap: true })
+    if (!state) return
+    surface.setState({ ...state, flap: true })
+    surface.post({ flap: true })
   }
   surface.onKey(e => {
     if (FLAP_KEYS.has(e.key)) flap()
+    else if (e.key === 'q') surface.post({ close: true })
   })
   surface.onPointer(e => {
     if (e.type === 'down') flap()
@@ -49,7 +54,7 @@ const Flappy: ClientModule<Props, State> = (props, surface) => {
   const { Box, Text } = surface.elements
   const state = surface.state
   if (surface.columns > 0 && (surface.columns < MIN_COLUMNS || surface.rows < MIN_ROWS)) {
-    return <Text dimColor>Make the pane bigger to play.</Text>
+    return <Text dimColor>Flappy Claude needs {MIN_ROWS} rows: make the terminal taller.</Text>
   }
   if (!state) return <Text dimColor>Loading…</Text>
 
@@ -57,7 +62,7 @@ const Flappy: ClientModule<Props, State> = (props, surface) => {
   const best = Math.max(props.best ?? 0, game.score)
   const hint = game.phase === 'ready'
     ? 'Click here, then Space or ↑ to flap'
-    : game.phase === 'over' ? 'Game over - Space to retry' : ''
+    : game.phase === 'over' ? 'Game over - Space to retry, q to close' : ''
   return (
     <Box flexDirection="column">
       <Box flexDirection="row" gap={3}>
