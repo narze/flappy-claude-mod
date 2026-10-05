@@ -28,19 +28,16 @@ const MARGIN = 3
 // Ticks after a crash before a flap may restart, so a late flap does not.
 const RESTART_DELAY = 15
 
-// The Claude mascot, one character per pixel: '#' body, 'e' eye, '.' sky.
+// The Claude mascot at half size, one character per pixel: '#' body,
+// 'e' eye, '.' sky. Ears and eyes share a row; each leg pair is one leg.
 export const MASCOT = [
-  '.#########.',
-  '.#########.',
-  '##e#####e##',
-  '###########',
-  '.#########.',
-  '.#########.',
-  '.#.#...#.#.',
-  '.#.#...#.#.',
+  '.#####.',
+  '#e###e#',
+  '.#####.',
+  '.##.##.',
 ] as const
-export const BIRD_WIDTH = 11
-export const BIRD_HEIGHT = 8
+export const BIRD_WIDTH = 7
+export const BIRD_HEIGHT = 4
 // Crashes count the body columns only: brushing a pipe with an ear is fair.
 const HIT_LEFT = 1
 const HIT_RIGHT = BIRD_WIDTH - 1

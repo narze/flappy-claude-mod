@@ -3,14 +3,14 @@
 A Flappy Bird-like game inside Claude Code, as a mod (a plugin of function hooks).
 
 - Plays in the band above the prompt, drawn with half blocks (`▀`): one cell is 1x2 pixels, in color
-- You fly the Claude mascot: an 11x8 orange critter with ears, eyes and four legs
+- You fly the Claude mascot: a 7x4 orange critter with ears, eyes and legs
 - A flap sound on each flap (macOS, through `afplay`)
 - Runs in a `Client` surface module: its own 30 fps frame clock, keys and clicks, no round trip through the hooks
 - Best score kept across sessions in `$.store`
 
 ## Play
 
-1. Type `/flappy-claude`. The game shows above the prompt (it needs 14 rows).
+1. Type `/flappy-claude`. The game shows above the prompt (it needs 10 rows).
 2. Click the game, so it gets the keyboard.
 3. Press **Space**, **↑**, `w`, `k` or **Enter** to flap. A click flaps too.
 4. Fly through the gaps in the pipes. Each pipe you pass is one point. Ears may brush a pipe; the body may not.
