@@ -1,6 +1,6 @@
 import { expect, test } from 'claude-code/testing'
 
-import { BIRD_HEIGHT, BIRD_WIDTH, COLORS, GROUND, MASCOT, PIPE_WIDTH, birdX, newGame, paint, rows, step, type Game } from './game.ts'
+import { BIRD_HEIGHT, BIRD_WIDTH, COLORS, GROUND, MASCOT, PIPE_WIDTH, TITLE_TOP, birdX, newGame, paint, rows, step, type Game } from './game.ts'
 
 const W = 60
 const H = 40
@@ -154,4 +154,44 @@ test('paint draws sky, ground, bird and pipes into half-block rows', () => {
   ])
   const clear = rows(paint({ ...g, pipes: [] }), W, H)
   expect(clear[0]).toEqual([{ text: '▀'.repeat(W), fg: COLORS.sky, bg: COLORS.sky }])
+})
+
+function colored(pixels: string[], color: string) {
+  return pixels.reduce((n, pixel) => n + (pixel === color ? 1 : 0), 0)
+}
+
+test('before the first flap the sky shows the title and the best score', () => {
+  const ready = newGame(60, 46, 1)
+  const pixels = paint(ready, 12)
+  expect(colored(pixels, COLORS.title)).toBeGreaterThan(40)
+  expect(colored(pixels, COLORS.titleShadow)).toBeGreaterThan(20)
+  expect(colored(pixels, COLORS.best)).toBeGreaterThan(20)
+  // "FLAPPY CLAUDE" is 13 glyphs of 3x5 with 1 gap: 51 wide, centered
+  const left = Math.floor((60 - 51) / 2)
+  const top = TITLE_TOP
+  expect([0, 1, 2].map(dx => pixels[top * 60 + left + dx])).toEqual([COLORS.title, COLORS.title, COLORS.title])
+  expect(pixels[(top + 1) * 60 + left + 1]).toBe(COLORS.titleShadow)
+})
+
+test('the title goes away once the game starts', () => {
+  const playing = step(newGame(60, 46, 1), true)
+  const pixels = paint(playing, 12)
+  expect(colored(pixels, COLORS.title)).toBe(0)
+  expect(colored(pixels, COLORS.best)).toBe(0)
+})
+
+test('a narrow sky splits the title into two lines', () => {
+  const pixels = paint(newGame(40, 46, 1), 3)
+  const left = Math.floor((40 - 23) / 2) // "FLAPPY": 6 glyphs, 23 wide
+  expect(pixels[TITLE_TOP * 40 + left]).toBe(COLORS.title)
+  const second = TITLE_TOP + 6
+  const leftClaude = Math.floor((40 - 23) / 2)
+  expect(pixels[second * 40 + leftClaude + 1]).toBe(COLORS.title) // C's top
+})
+
+test('a short sky keeps the title clear of the mascot and drops the best score', () => {
+  const g = newGame(60, 20, 1)
+  const pixels = paint(g, 9)
+  expect(colored(pixels, COLORS.best)).toBe(0)
+  expect(colored(pixels, COLORS.bird)).toBeGreaterThan(0)
 })

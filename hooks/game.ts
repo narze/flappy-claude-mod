@@ -53,9 +53,45 @@ export const COLORS = {
   ground: '#ded895',
   bird: '#d97757',
   eye: '#000000',
+  title: '#ffffff',
+  titleShadow: '#2a6d74',
+  best: '#f8d81f',
 } as const
 
 export const birdX = (width: number) => Math.floor(width / 4)
+
+// Where the title starts, in pixels from the top.
+export const TITLE_TOP = 3
+const GLYPH_WIDTH = 3
+const GLYPH_HEIGHT = 5
+
+// A 3x5 pixel font: just the letters and digits the title screen needs.
+const FONT: Record<string, readonly string[]> = {
+  A: ['.#.', '#.#', '###', '#.#', '#.#'],
+  B: ['##.', '#.#', '##.', '#.#', '##.'],
+  C: ['.##', '#..', '#..', '#..', '.##'],
+  D: ['##.', '#.#', '#.#', '#.#', '##.'],
+  E: ['###', '#..', '##.', '#..', '###'],
+  F: ['###', '#..', '##.', '#..', '#..'],
+  L: ['#..', '#..', '#..', '#..', '###'],
+  P: ['##.', '#.#', '##.', '#..', '#..'],
+  S: ['.##', '#..', '.#.', '..#', '##.'],
+  T: ['###', '.#.', '.#.', '.#.', '.#.'],
+  U: ['#.#', '#.#', '#.#', '#.#', '###'],
+  Y: ['#.#', '#.#', '.#.', '.#.', '.#.'],
+  '0': ['###', '#.#', '#.#', '#.#', '###'],
+  '1': ['.#.', '##.', '.#.', '.#.', '###'],
+  '2': ['##.', '..#', '.#.', '#..', '###'],
+  '3': ['##.', '..#', '.#.', '..#', '##.'],
+  '4': ['#.#', '#.#', '###', '..#', '..#'],
+  '5': ['###', '#..', '##.', '..#', '##.'],
+  '6': ['.##', '#..', '###', '#.#', '###'],
+  '7': ['###', '..#', '.#.', '.#.', '.#.'],
+  '8': ['###', '#.#', '###', '#.#', '###'],
+  '9': ['###', '#.#', '###', '..#', '##.'],
+}
+
+const textWidth = (text: string) => text.length * (GLYPH_WIDTH + 1) - 1
 
 export function newGame(width: number, height: number, seed: number): Game {
   return {
@@ -132,12 +168,39 @@ export function step(game: Game, flap: boolean): Game {
   return moved
 }
 
-// Every pixel's color, row-major, `width * height`.
-export function paint(game: Game): string[] {
+// Every pixel's color, row-major, `width * height`. Before the first flap
+// the sky also shows the title and `best`.
+export function paint(game: Game, best = 0): string[] {
   const { width, height } = game
   const pixels = new Array<string>(width * height).fill(COLORS.sky)
   const set = (x: number, y: number, color: string) => {
     if (x >= 0 && x < width && y >= 0 && y < height) pixels[y * width + x] = color
+  }
+  // `text` centered with its top at `top`; a shadow one pixel down-right.
+  const write = (text: string, top: number, color: string, shadow?: string) => {
+    const left = Math.floor((width - textWidth(text)) / 2)
+    const ink = (inkColor: string, offset: number) =>
+      [...text].forEach((char, i) => {
+        FONT[char]?.forEach((line, dy) => {
+          for (let dx = 0; dx < GLYPH_WIDTH; dx++) {
+            if (line[dx] === '#') set(left + i * (GLYPH_WIDTH + 1) + dx + offset, top + dy + offset, inkColor)
+          }
+        })
+      })
+    if (shadow) ink(shadow, 1)
+    ink(color, 0)
+  }
+  if (game.phase === 'ready') {
+    const clearAbove = Math.floor(game.height / 2) - 2
+    const title = textWidth('FLAPPY CLAUDE') + 2 <= width ? ['FLAPPY CLAUDE'] : ['FLAPPY', 'CLAUDE']
+    const fits = title.every(line => textWidth(line) + 2 <= width)
+    const titleBottom = TITLE_TOP + title.length * (GLYPH_HEIGHT + 1) - 1
+    if (fits && titleBottom < clearAbove) {
+      title.forEach((line, i) => write(line, TITLE_TOP + i * (GLYPH_HEIGHT + 1), COLORS.title, COLORS.titleShadow))
+      const bestTop = titleBottom + 2
+      const bestText = `BEST ${best}`
+      if (bestTop + GLYPH_HEIGHT < clearAbove && textWidth(bestText) <= width) write(bestText, bestTop, COLORS.best)
+    }
   }
   for (const pipe of game.pipes) {
     const left = pipeLeft(pipe)

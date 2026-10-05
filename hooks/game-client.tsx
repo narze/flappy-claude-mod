@@ -70,7 +70,7 @@ const Flappy: ClientModule<Props, State> = (props, surface) => {
         <Text dimColor>Best {best}</Text>
         {hint !== '' && <Text color={game.phase === 'over' ? 'red' : 'yellow'}>{hint}</Text>}
       </Box>
-      {rows(paint(game), game.width, game.height).map(line => (
+      {rows(paint(game, best), game.width, game.height).map(line => (
         <Text>
           {line.map(run => (
             <Text color={run.fg} backgroundColor={run.bg}>{run.text}</Text>
