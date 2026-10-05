@@ -32,7 +32,7 @@ const RESTART_DELAY = 15
 // 'e' eye, '.' sky. Ears and eyes share a row; each leg pair is one leg.
 export const MASCOT = [
   '.#####.',
-  '#e###e#',
+  '##e#e##',
   '.#####.',
   '.##.##.',
 ] as const
