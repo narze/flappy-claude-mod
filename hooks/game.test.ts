@@ -1,6 +1,6 @@
 import { expect, test } from 'claude-code/testing'
 
-import { BIRD_HEIGHT, COLORS, GROUND, PIPE_WIDTH, birdX, newGame, paint, rows, step, type Game } from './game.ts'
+import { BIRD_HEIGHT, BIRD_WIDTH, COLORS, GROUND, MASCOT, PIPE_WIDTH, birdX, newGame, paint, rows, step, type Game } from './game.ts'
 
 const W = 60
 const H = 40
@@ -43,6 +43,29 @@ test('the ceiling stops the bird but does not end the game', () => {
   expect(g.phase).toBe('playing')
 })
 
+test('the gap always fits the mascot with room to spare', () => {
+  for (const height of [26, 30, 40, 60]) {
+    const g = newGame(W, height, 1)
+    expect(g.gap).toBeGreaterThanOrEqual(BIRD_HEIGHT + 6)
+    expect(g.gap).toBeLessThanOrEqual(height - GROUND - 6)
+  }
+})
+
+test('the mascot sprite is the 11x8 Claude critter', () => {
+  expect(MASCOT.length).toBe(BIRD_HEIGHT)
+  for (const line of MASCOT) expect(line.length).toBe(BIRD_WIDTH)
+  expect(MASCOT).toEqual([
+    '.#########.',
+    '.#########.',
+    '##e#####e##',
+    '###########',
+    '.#########.',
+    '.#########.',
+    '.#.#...#.#.',
+    '.#.#...#.#.',
+  ])
+})
+
 test('pipes scroll in from the right and are spawned with a gap', () => {
   const g = run(step(newGame(W, H, 7), true), 30, 9)
   expect(g.pipes.length).toBeGreaterThan(0)
@@ -61,7 +84,7 @@ test('flying through a gap scores; touching a pipe ends the game', () => {
   expect(scored.score).toBe(1)
   expect(scored.phase).toBe('playing')
   // a pipe at the bird with the gap far above: a hit
-  const hitting: Game = { ...base, pipes: [{ x, gapTop: 0, isScored: false }], birdY: 30 }
+  const hitting: Game = { ...base, pipes: [{ x, gapTop: 0, isScored: false }], birdY: 20 }
   expect(step(hitting, false).phase).toBe('over')
 })
 
@@ -87,7 +110,13 @@ test('paint draws sky, ground, bird and pipes into half-block rows', () => {
   expect(pixels.length).toBe(W * H)
   expect(pixels[0]).toBe(COLORS.sky)
   expect(pixels[(H - 1) * W]).toBe(COLORS.ground)
-  expect(pixels[Math.round(g.birdY) * W + birdX(W)]).toBe(COLORS.bird)
+  const bx = birdX(W)
+  const by = Math.round(g.birdY)
+  expect(pixels[by * W + bx]).toBe(COLORS.sky) // corner outside the body
+  expect(pixels[by * W + bx + 1]).toBe(COLORS.bird)
+  expect(pixels[(by + 2) * W + bx]).toBe(COLORS.bird) // ear
+  expect(pixels[(by + 2) * W + bx + 2]).toBe(COLORS.eye)
+  expect(pixels[(by + 6) * W + bx + 5]).toBe(COLORS.sky) // between the legs
   expect(pixels[2 * W + 41]).toBe(COLORS.pipe)
   expect(pixels[12 * W + 41]).toBe(COLORS.sky)
 

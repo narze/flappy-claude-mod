@@ -28,8 +28,22 @@ const MARGIN = 3
 // Ticks after a crash before a flap may restart, so a late flap does not.
 const RESTART_DELAY = 15
 
-export const BIRD_WIDTH = 3
-export const BIRD_HEIGHT = 2
+// The Claude mascot, one character per pixel: '#' body, 'e' eye, '.' sky.
+export const MASCOT = [
+  '.#########.',
+  '.#########.',
+  '##e#####e##',
+  '###########',
+  '.#########.',
+  '.#########.',
+  '.#.#...#.#.',
+  '.#.#...#.#.',
+] as const
+export const BIRD_WIDTH = 11
+export const BIRD_HEIGHT = 8
+// Crashes count the body columns only: brushing a pipe with an ear is fair.
+const HIT_LEFT = 1
+const HIT_RIGHT = BIRD_WIDTH - 1
 export const PIPE_WIDTH = 4
 export const GROUND = 2
 
@@ -39,9 +53,8 @@ export const COLORS = {
   pipeEdge: '#3f7d1a',
   grass: '#5ee270',
   ground: '#ded895',
-  bird: '#f8d81f',
-  eye: '#ffffff',
-  beak: '#f87828',
+  bird: '#d97757',
+  eye: '#000000',
 } as const
 
 export const birdX = (width: number) => Math.floor(width / 4)
@@ -50,7 +63,7 @@ export function newGame(width: number, height: number, seed: number): Game {
   return {
     width,
     height,
-    gap: Math.max(10, Math.round(height * 0.34)),
+    gap: Math.min(height - GROUND - 6, Math.max(BIRD_HEIGHT + 6, Math.round(height * 0.4))),
     seed: Math.abs(Math.floor(seed)) % 0x7fffffff || 1,
     phase: 'ready',
     birdY: height / 2,
@@ -72,7 +85,7 @@ const pipeLeft = (pipe: Pipe) => Math.round(pipe.x)
 function hits(game: Game, pipe: Pipe): boolean {
   const x = birdX(game.width)
   const left = pipeLeft(pipe)
-  const overlapsX = x < left + PIPE_WIDTH && x + BIRD_WIDTH > left
+  const overlapsX = x + HIT_LEFT < left + PIPE_WIDTH && x + HIT_RIGHT > left
   const top = game.birdY
   const bottom = game.birdY + BIRD_HEIGHT
   return overlapsX && (top < pipe.gapTop || bottom > pipe.gapTop + game.gap)
@@ -101,7 +114,7 @@ export function step(game: Game, flap: boolean): Game {
     .map(pipe => ({ ...pipe, x: pipe.x - SPEED }))
     .filter(pipe => pipe.x + PIPE_WIDTH > 0)
     .map(pipe => {
-      if (pipe.isScored || pipeLeft(pipe) + PIPE_WIDTH > x) return pipe
+      if (pipe.isScored || pipeLeft(pipe) + PIPE_WIDTH > x + HIT_LEFT) return pipe
       score++
       return { ...pipe, isScored: true }
     })
@@ -145,12 +158,13 @@ export function paint(game: Game): string[] {
   }
   const bx = birdX(width)
   const by = Math.round(game.birdY)
-  set(bx, by, COLORS.bird)
-  set(bx + 1, by, COLORS.bird)
-  set(bx + 2, by, COLORS.eye)
-  set(bx, by + 1, COLORS.bird)
-  set(bx + 1, by + 1, COLORS.bird)
-  set(bx + 2, by + 1, COLORS.beak)
+  MASCOT.forEach((line, dy) => {
+    for (let dx = 0; dx < line.length; dx++) {
+      const pixel = line[dx]
+      if (pixel === '#') set(bx + dx, by + dy, COLORS.bird)
+      else if (pixel === 'e') set(bx + dx, by + dy, COLORS.eye)
+    }
+  })
   return pixels
 }
 
