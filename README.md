@@ -15,7 +15,7 @@ A Flappy Bird-like game inside Claude Code, as a mod (a plugin of function hooks
 2. Click the game, so it gets the keyboard.
 3. Press **Space**, **↑**, `w`, `k` or **Enter** to flap. A click flaps too.
 4. Fly through the gaps in the pipes. Each pipe you pass is one point. Ears may brush a pipe; the body may not.
-5. After a crash, wait a moment, then flap to play again.
+5. After a crash, wait a moment, then flap to go back to the title screen; flap again to play.
 6. Press `q`, or type `/flappy-claude` again, to close it.
 
 ## Install

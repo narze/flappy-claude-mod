@@ -114,14 +114,16 @@ function untilOver(game: Game): Game {
   return g
 }
 
-test('after game over a flap starts a fresh game, not at once', () => {
+test('after game over a flap goes to the title, and the next flap plays', () => {
   const over = untilOver(step(newGame(W, H, 1), true))
   expect(step(over, true).phase).toBe('over')
   const later = run(over, 20)
-  const again = step(later, true)
-  expect(again.phase).toBe('playing')
-  expect(again.score).toBe(0)
-  expect(again.pipes).toEqual([])
+  const title = step(later, true)
+  expect(title.phase).toBe('ready')
+  expect(title.score).toBe(0)
+  expect(title.pipes).toEqual([])
+  expect(run(title, 30).phase).toBe('ready')
+  expect(step(title, true).phase).toBe('playing')
 })
 
 test('paint draws sky, ground, bird and pipes into half-block rows', () => {

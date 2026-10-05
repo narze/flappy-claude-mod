@@ -147,7 +147,8 @@ export function step(game: Game, flap: boolean): Game {
   }
   if (game.phase === 'over') {
     if (flap && game.overTicks >= RESTART_DELAY) {
-      return step(newGame(game.width, game.height, nextSeed(game.seed)), true)
+      // Back to the title screen; the next flap starts the run.
+      return newGame(game.width, game.height, nextSeed(game.seed))
     }
     return { ...game, ticks, overTicks: game.overTicks + 1 }
   }

@@ -62,7 +62,7 @@ const Flappy: ClientModule<Props, State> = (props, surface) => {
   const best = Math.max(props.best ?? 0, game.score)
   const hint = game.phase === 'ready'
     ? 'Click here, then Space or ↑ to flap'
-    : game.phase === 'over' ? 'Game over - Space to retry, q to close' : ''
+    : game.phase === 'over' ? 'Game over - Space for the title, q to close' : ''
   return (
     <Box flexDirection="column">
       <Box flexDirection="row" gap={3}>
