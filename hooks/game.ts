@@ -23,7 +23,7 @@ export type Run = { text: string; fg: string; bg: string }
 const GRAVITY = 0.11
 const FLAP = -1.3
 const MAX_FALL = 1.8
-const SPEED = 0.45
+const SPEED = 0.6
 const SPACING = 30
 const MARGIN = 3
 // Ticks after a crash before a flap may restart, so a late flap does not.
@@ -65,6 +65,9 @@ export const DEAD_EYE = 'dead-eye'
 
 // Where the title starts, in pixels from the top.
 export const TITLE_TOP = 3
+// Where the score sits while playing: the top-left corner of the sky.
+export const SCORE_LEFT = 2
+export const SCORE_TOP = 2
 const GLYPH_WIDTH = 3
 const GLYPH_HEIGHT = 5
 
@@ -179,9 +182,10 @@ export function paint(game: Game, best = 0): string[] {
   const set = (x: number, y: number, color: string) => {
     if (x >= 0 && x < width && y >= 0 && y < height) pixels[y * width + x] = color
   }
-  // `text` centered with its top at `top`; a shadow one pixel down-right.
-  const write = (text: string, top: number, color: string, shadow?: string) => {
-    const left = Math.floor((width - textWidth(text)) / 2)
+  // `text` with its top-left at `left`, `top` (centered when `left` is
+  // undefined); a shadow one pixel down-right.
+  const write = (text: string, top: number, color: string, shadow?: string, at?: number) => {
+    const left = at ?? Math.floor((width - textWidth(text)) / 2)
     const ink = (inkColor: string, offset: number) =>
       [...text].forEach((char, i) => {
         FONT[char]?.forEach((line, dy) => {
@@ -220,6 +224,7 @@ export function paint(game: Game, best = 0): string[] {
     set(x, height - GROUND, COLORS.grass)
     for (let y = height - GROUND + 1; y < height; y++) set(x, y, COLORS.ground)
   }
+  if (game.phase !== 'ready') write(String(game.score), SCORE_TOP, COLORS.title, COLORS.titleShadow, SCORE_LEFT)
   const bx = birdX(width)
   const by = Math.round(game.birdY)
   MASCOT.forEach((line, dy) => {

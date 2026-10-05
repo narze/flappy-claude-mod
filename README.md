@@ -5,7 +5,7 @@ A Flappy Bird-like game inside Claude Code, as a mod (a plugin of function hooks
 - Plays in the band above the prompt, drawn with half blocks (`▀`): one cell is 1x2 pixels, in color
 - You fly the Claude mascot: a 9x5 orange critter with ears, eyes and four legs
 - A flap sound on each flap (macOS, through `afplay`)
-- A title screen with your best score before the first flap; X eyes after a crash
+- A title screen with your best score before the first flap; the score in pixel digits at the top left while you play; X eyes after a crash
 - Runs in a `Client` surface module: its own 30 fps frame clock, keys and clicks, no round trip through the hooks
 - Best score kept across sessions in `$.store`
 

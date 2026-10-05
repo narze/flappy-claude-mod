@@ -1,6 +1,6 @@
 import { expect, test } from 'claude-code/testing'
 
-import { BIRD_HEIGHT, BIRD_WIDTH, COLORS, DEAD_EYE, GROUND, MASCOT, PIPE_WIDTH, TITLE_TOP, birdX, newGame, paint, rows, step, type Game } from './game.ts'
+import { BIRD_HEIGHT, BIRD_WIDTH, COLORS, DEAD_EYE, GROUND, MASCOT, PIPE_WIDTH, SCORE_LEFT, SCORE_TOP, TITLE_TOP, birdX, newGame, paint, rows, step, type Game } from './game.ts'
 
 const W = 60
 const H = 40
@@ -57,7 +57,7 @@ test('the gap is about half the play height, so it is forgiving', () => {
   expect(newGame(W, 30, 1).gap).toBeGreaterThanOrEqual(BIRD_HEIGHT + 8)
 })
 
-test('pipes come slowly and far apart', () => {
+test('pipes come 30 apart at 0.6 columns a tick', () => {
   let g = step(newGame(120, 46, 3), true)
   for (let i = 0; i < 120; i++) g = step({ ...g, birdY: 20, velocity: 0 }, false)
   const xs = g.pipes.map(pipe => pipe.x)
@@ -65,8 +65,9 @@ test('pipes come slowly and far apart', () => {
     expect(xs[i]! - xs[i - 1]!).toBeGreaterThanOrEqual(30)
     expect(xs[i]! - xs[i - 1]!).toBeLessThan(31)
   }
-  // 120 ticks (4 s) move a pipe no more than 55 columns
-  expect(120 - (xs[0] ?? 0)).toBeLessThanOrEqual(55)
+  // the first pipe spawns on tick 1, so 119 ticks move it 71.4 columns
+  expect(120 - (xs[0] ?? 0)).toBeGreaterThan(71.39)
+  expect(120 - (xs[0] ?? 0)).toBeLessThan(71.41)
 })
 
 test('pipes are 6 pixels wide', () => {
@@ -176,7 +177,9 @@ test('before the first flap the sky shows the title and the best score', () => {
 test('the title goes away once the game starts', () => {
   const playing = step(newGame(60, 46, 1), true)
   const pixels = paint(playing, 12)
-  expect(colored(pixels, COLORS.title)).toBe(0)
+  // the top of CLAUDE's C (glyph 7) is sky again; only the score's '0' is white
+  expect(pixels[TITLE_TOP * 60 + Math.floor((60 - 51) / 2) + 7 * 4 + 1]).toBe(COLORS.sky)
+  expect(colored(pixels, COLORS.title)).toBe(12)
   expect(colored(pixels, COLORS.best)).toBe(0)
 })
 
@@ -216,4 +219,26 @@ test('while alive the eyes are plain pixels', () => {
   const playing = step(newGame(W, H, 1), true)
   expect(colored(paint(playing), DEAD_EYE)).toBe(0)
   expect(colored(paint(playing), COLORS.eye)).toBe(2)
+})
+
+test('while playing and after a crash the score shows top left', () => {
+  const playing: Game = { ...step(newGame(W, H, 1), true), score: 7 }
+  const pixels = paint(playing)
+  // '7' is ###/..#/.#./.#./.#.
+  expect([0, 1, 2].map(dx => pixels[SCORE_TOP * W + SCORE_LEFT + dx])).toEqual([COLORS.title, COLORS.title, COLORS.title])
+  expect(pixels[(SCORE_TOP + 1) * W + SCORE_LEFT]).toBe(COLORS.sky)
+  expect(pixels[(SCORE_TOP + 1) * W + SCORE_LEFT + 1]).toBe(COLORS.titleShadow)
+  const over = paint({ ...untilOver(step(newGame(W, H, 1), true)), score: 12 })
+  expect(colored(over, COLORS.title)).toBeGreaterThan(10)
+})
+
+test('the score is drawn over a pipe', () => {
+  const g: Game = { ...step(newGame(W, H, 1), true), score: 8, pipes: [{ x: SCORE_LEFT - 1, gapTop: 30, isScored: false }] }
+  const pixels = paint(g)
+  expect(pixels[SCORE_TOP * W + SCORE_LEFT]).toBe(COLORS.title)
+})
+
+test('the title screen shows no score', () => {
+  const ready = paint(newGame(W, H, 1))
+  expect(ready[SCORE_TOP * W + SCORE_LEFT]).toBe(COLORS.sky)
 })

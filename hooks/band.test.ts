@@ -89,8 +89,8 @@ test('Space starts the game with a flap sound, and a crash says game over', asyn
   await ui.key({ key: ' ', in: 'game' })
   expect(played).toEqual(['sounds/flap.wav'])
   await ui.advance(33 * 5)
-  expect(await ui.find({ text: /Score 0/, in: 'game' })).toBeDefined()
   expect(await ui.find({ text: /to flap/, in: 'game' })).toBeUndefined()
+  expect(await ui.find({ text: /Score/, in: 'game' })).toBeUndefined() // drawn in the sky now
   await ui.advance(33 * 120)
   expect(await ui.find({ text: /Game over/, in: 'game' })).toBeDefined()
   await ui.unmount()
@@ -102,7 +102,7 @@ test('a click flaps too, with the sound', async ($, on) => {
   const ui = await mountGame($)
   await ui.pointer({ type: 'down', x: 5, y: 5, button: 'left', in: 'game' })
   await ui.advance(66)
-  expect(await ui.find({ text: /Score 0/, in: 'game' })).toBeDefined()
+  expect(await ui.find({ text: /to flap/, in: 'game' })).toBeUndefined()
   expect(played).toEqual(['sounds/flap.wav'])
   await ui.unmount()
 })

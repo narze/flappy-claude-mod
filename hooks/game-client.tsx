@@ -66,7 +66,6 @@ const Flappy: ClientModule<Props, State> = (props, surface) => {
   return (
     <Box flexDirection="column">
       <Box flexDirection="row" gap={3}>
-        <Text bold>Score {game.score}</Text>
         <Text dimColor>Best {best}</Text>
         {hint !== '' && <Text color={game.phase === 'over' ? 'red' : 'yellow'}>{hint}</Text>}
       </Box>
