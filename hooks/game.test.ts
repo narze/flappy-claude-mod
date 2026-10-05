@@ -1,6 +1,6 @@
 import { expect, test } from 'claude-code/testing'
 
-import { BIRD_HEIGHT, BIRD_WIDTH, COLORS, GROUND, MASCOT, PIPE_WIDTH, TITLE_TOP, birdX, newGame, paint, rows, step, type Game } from './game.ts'
+import { BIRD_HEIGHT, BIRD_WIDTH, COLORS, DEAD_EYE, GROUND, MASCOT, PIPE_WIDTH, TITLE_TOP, birdX, newGame, paint, rows, step, type Game } from './game.ts'
 
 const W = 60
 const H = 40
@@ -194,4 +194,26 @@ test('a short sky keeps the title clear of the mascot and drops the best score',
   const pixels = paint(g, 9)
   expect(colored(pixels, COLORS.best)).toBe(0)
   expect(colored(pixels, COLORS.bird)).toBeGreaterThan(0)
+})
+
+test('after a crash the eyes become X', () => {
+  const over = untilOver(step(newGame(W, H, 1), true))
+  const pixels = paint(over)
+  const bx = birdX(W)
+  const by = Math.round(over.birdY)
+  expect(pixels[(by + 1) * W + bx + 2]).toBe(DEAD_EYE)
+  expect(pixels[(by + 1) * W + bx + 6]).toBe(DEAD_EYE)
+  expect(colored(pixels, COLORS.eye)).toBe(0)
+  const line = rows(pixels, W, H)[(by + 1) >> 1]!
+  expect(line.map(run => run.text).join('').slice(bx, bx + 9)).toBe('▀▀X▀▀▀X▀▀')
+  expect(line.filter(run => run.text === 'X')).toEqual([
+    { text: 'X', fg: COLORS.eye, bg: COLORS.bird },
+    { text: 'X', fg: COLORS.eye, bg: COLORS.bird },
+  ])
+})
+
+test('while alive the eyes are plain pixels', () => {
+  const playing = step(newGame(W, H, 1), true)
+  expect(colored(paint(playing), DEAD_EYE)).toBe(0)
+  expect(colored(paint(playing), COLORS.eye)).toBe(2)
 })

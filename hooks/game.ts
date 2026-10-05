@@ -60,6 +60,9 @@ export const COLORS = {
 
 export const birdX = (width: number) => Math.floor(width / 4)
 
+// Not a color: marks an eye after a crash, which `rows` draws as an 'X'.
+export const DEAD_EYE = 'dead-eye'
+
 // Where the title starts, in pixels from the top.
 export const TITLE_TOP = 3
 const GLYPH_WIDTH = 3
@@ -223,7 +226,7 @@ export function paint(game: Game, best = 0): string[] {
     for (let dx = 0; dx < line.length; dx++) {
       const pixel = line[dx]
       if (pixel === '#') set(bx + dx, by + dy, COLORS.bird)
-      else if (pixel === 'e') set(bx + dx, by + dy, COLORS.eye)
+      else if (pixel === 'e') set(bx + dx, by + dy, game.phase === 'over' ? DEAD_EYE : COLORS.eye)
     }
   })
   return pixels
@@ -239,7 +242,11 @@ export function rows(pixels: string[], width: number, height: number): Run[][] {
       const fg = pixels[r * 2 * width + x] ?? COLORS.sky
       const bg = pixels[(r * 2 + 1) * width + x] ?? COLORS.sky
       const last = line[line.length - 1]
-      if (last && last.fg === fg && last.bg === bg) last.text += '▀'
+      if (fg === DEAD_EYE || bg === DEAD_EYE) {
+        // The eye's cell is a black X over the body's half beside it.
+        const other = fg === DEAD_EYE ? bg : fg
+        line.push({ text: 'X', fg: COLORS.eye, bg: other === DEAD_EYE ? COLORS.bird : other })
+      } else if (last && last.text.endsWith('▀') && last.fg === fg && last.bg === bg) last.text += '▀'
       else line.push({ text: '▀', fg, bg })
     }
     lines.push(line)
